@@ -32,6 +32,8 @@ import java.util.List;
 
 public class ForecastFragment extends Fragment {
 
+    private ArrayAdapter<String> weekForecastAdapter;
+
     public ForecastFragment() {
     }
 
@@ -76,7 +78,7 @@ public class ForecastFragment extends Fragment {
 
         List<String> weekForecast = new ArrayList<>(Arrays.asList(forecastArray));
 
-        ArrayAdapter<String> weekForecastAdapter = new ArrayAdapter<>(
+        weekForecastAdapter = new ArrayAdapter<>(
                 getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_text_view,
@@ -254,6 +256,17 @@ public class ForecastFragment extends Fragment {
             }
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] weekForecast) {
+            if (weekForecast != null) {
+                weekForecastAdapter.clear();
+
+                for (String dayForecast : weekForecast) {
+                    weekForecastAdapter.add(dayForecast);
+                }
+            }
         }
     }
 }
