@@ -11,8 +11,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,7 +68,7 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        String[] forecastArray = {
+        final String[] forecastArray = {
                 "Today - Sunny - 88/63",
                 "Tomorrow - Foggy - 70/40",
                 "Weds - Cloudy - 72/63",
@@ -86,6 +88,13 @@ public class ForecastFragment extends Fragment {
 
         ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
         listView.setAdapter(weekForecastAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String text = weekForecastAdapter.getItem(position);
+                Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return rootView;
     }
