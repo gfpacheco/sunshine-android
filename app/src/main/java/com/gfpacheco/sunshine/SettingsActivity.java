@@ -29,6 +29,7 @@ public class SettingsActivity extends PreferenceActivity
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             addPreferencesFromResource(R.xml.pref_general);
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
         } else {
             getFragmentManager().beginTransaction()
                     .replace(android.R.id.content, new SettingsFragment())
@@ -82,6 +83,7 @@ public class SettingsActivity extends PreferenceActivity
             PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_general, false);
             addPreferencesFromResource(R.xml.pref_general);
             bindSharedPreferenceSummaryToValue(getString(R.string.pref_location_key));
+            bindSharedPreferenceSummaryToValue(getString(R.string.pref_units_key));
         }
 
         private void bindSharedPreferenceSummaryToValue(String key) {

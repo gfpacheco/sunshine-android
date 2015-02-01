@@ -115,10 +115,19 @@ public class ForecastFragment extends Fragment {
             return new SimpleDateFormat("E, MMM d").format(date);
         }
 
+        private double convertCelsiusToFahrenheit(double celsius) {
+            return (celsius * 1.8) + 32;
+        }
+
         /**
          * Prepare the weather high/lows for presentation.
          */
         private String formatHighLows(double high, double low) {
+            if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string.pref_units_key), getString(R.string.pref_units_metric))
+                    .equals(getString(R.string.pref_units_imperial))) {
+                high = convertCelsiusToFahrenheit(high);
+                low = convertCelsiusToFahrenheit(low);
+            }
             // For presentation, assume the user doesn't care about tenths of a degree.
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
