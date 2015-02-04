@@ -16,6 +16,7 @@
 package com.gfpacheco.sunshine.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -56,6 +57,8 @@ public class WeatherProvider extends ContentProvider {
             WeatherContract.LocationEntry.TABLE_NAME +
                     "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
                     WeatherContract.WeatherEntry.COLUMN_DATETEXT + " = ? ";
+    private static final String sLocationByIdSelection =
+            WeatherContract.LocationEntry._ID + " = ? ";
     private WeatherDbHelper mOpenHelper;
 
     private static UriMatcher buildUriMatcher() {
@@ -119,6 +122,19 @@ public class WeatherProvider extends ContentProvider {
         );
     }
 
+    private Cursor getLocationById(Uri uri, String[] projection) {
+        String locationId = String.valueOf(ContentUris.parseId(uri));
+
+        return mOpenHelper.getReadableDatabase().query(
+                WeatherContract.LocationEntry.TABLE_NAME,
+                projection,
+                sLocationByIdSelection,
+                new String[]{locationId},
+                null,
+                null,
+                null);
+    }
+
     @Override
     public boolean onCreate() {
         mOpenHelper = new WeatherDbHelper(getContext());
@@ -132,16 +148,6 @@ public class WeatherProvider extends ContentProvider {
         // and query the database accordingly.
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            // "weather/*/*"
-            case WEATHER_WITH_LOCATION_AND_DATE: {
-                retCursor = getWeatherByLocationSettingAndDate(uri, projection, sortOrder);
-                break;
-            }
-            // "weather/*"
-            case WEATHER_WITH_LOCATION: {
-                retCursor = getWeatherByLocationSetting(uri, projection, sortOrder);
-                break;
-            }
             // "weather"
             case WEATHER: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -155,13 +161,34 @@ public class WeatherProvider extends ContentProvider {
                 );
                 break;
             }
-
-            /**
-             * TODO YOUR CODE BELOW HERE FOR QUIZ
-             * QUIZ - 4b - Implement Location_ID queries
-             * https://www.udacity.com/course/viewer#!/c-ud853/l-1576308909/e-1675098551/m-1675098552
-             **/
-
+            // "weather/*"
+            case WEATHER_WITH_LOCATION: {
+                retCursor = getWeatherByLocationSetting(uri, projection, sortOrder);
+                break;
+            }
+            // "weather/*/*"
+            case WEATHER_WITH_LOCATION_AND_DATE: {
+                retCursor = getWeatherByLocationSettingAndDate(uri, projection, sortOrder);
+                break;
+            }
+            // "location"
+            case LOCATION: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        WeatherContract.LocationEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            // "location/#"
+            case LOCATION_ID: {
+                retCursor = getLocationById(uri, projection);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

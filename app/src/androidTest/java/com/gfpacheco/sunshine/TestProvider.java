@@ -31,10 +31,74 @@ public class TestProvider extends AndroidTestCase {
     public static final String LOG_TAG = TestProvider.class.getSimpleName();
     static final String KALAMAZOO_LOCATION_SETTING = "kalamazoo";
     static final String KALAMAZOO_WEATHER_START_DATE = "20140625";
+    long locationRowId;
 
-    /* TODO Uncomment for
-    4b - Implement Location_ID queries
-    https://www.udacity.com/course/viewer#!/c-ud853/l-1576308909/e-1675098551/m-1675098552
+    static ContentValues createKalamazooWeatherValues(long locationRowId) {
+        ContentValues weatherValues = new ContentValues();
+        weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationRowId);
+        weatherValues.put(WeatherEntry.COLUMN_DATETEXT, KALAMAZOO_WEATHER_START_DATE);
+        weatherValues.put(WeatherEntry.COLUMN_DEGREES, 1.2);
+        weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, 1.5);
+        weatherValues.put(WeatherEntry.COLUMN_PRESSURE, 1.1);
+        weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, 85);
+        weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, 35);
+        weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, "Cats and Dogs");
+        weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, 3.4);
+        weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, 42);
+
+        return weatherValues;
+    }
+
+     /* TODO Uncomment for
+     4b - Updating and Deleting
+     https://www.udacity.com/course/viewer#!/c-ud853/l-1576308909/e-1675098563/m-1675098564
+     public void testUpdateLocation() {
+         // Create a new map of values, where column names are the keys
+         ContentValues values = TestDb.createNorthPoleLocationValues();
+
+         Uri locationUri = mContext.getContentResolver().
+                 insert(LocationEntry.CONTENT_URI, values);
+         long locationRowId = ContentUris.parseId(locationUri);
+
+         // Verify we got a row back.
+         assertTrue(locationRowId != -1);
+         Log.d(LOG_TAG, "New row id: " + locationRowId);
+
+         ContentValues updatedValues = new ContentValues(values);
+         updatedValues.put(LocationEntry._ID, locationRowId);
+         updatedValues.put(LocationEntry.COLUMN_CITY_NAME, "Santa's Village");
+
+         int count = mContext.getContentResolver().update(
+                 LocationEntry.CONTENT_URI, updatedValues, LocationEntry._ID + "= ?",
+                 new String[] { Long.toString(locationRowId)});
+
+         assertEquals(count, 1);
+
+         // A cursor is your primary interface to the query results.
+         Cursor cursor = mContext.getContentResolver().query(
+                 LocationEntry.buildLocationUri(locationRowId),
+                 null,
+                 null, // Columns for the "where" clause
+                 null, // Values for the "where" clause
+                 null // sort order
+         );
+
+         TestDb.validateCursor(cursor, updatedValues);
+     }
+     */
+
+    static ContentValues createKalamazooLocationValues() {
+        // Create a new map of values, where column names are the keys
+        ContentValues testValues = new ContentValues();
+        testValues.put(LocationEntry.COLUMN_LOCATION_SETTING, KALAMAZOO_LOCATION_SETTING);
+        testValues.put(LocationEntry.COLUMN_CITY_NAME, "Kalamazoo");
+        testValues.put(LocationEntry.COLUMN_COORD_LAT, 42.2917);
+        testValues.put(LocationEntry.COLUMN_COORD_LONG, -85.5872);
+
+        return testValues;
+    }
+
+    // Helper Methods
 
     public void testInsertReadProvider() {
 
@@ -124,75 +188,6 @@ public class TestProvider extends AndroidTestCase {
         );
         TestDb.validateCursor(weatherCursor, weatherValues);
     }
-      */
-     long locationRowId;
-
-     /* TODO Uncomment for
-     4b - Updating and Deleting
-     https://www.udacity.com/course/viewer#!/c-ud853/l-1576308909/e-1675098563/m-1675098564
-     public void testUpdateLocation() {
-         // Create a new map of values, where column names are the keys
-         ContentValues values = TestDb.createNorthPoleLocationValues();
-
-         Uri locationUri = mContext.getContentResolver().
-                 insert(LocationEntry.CONTENT_URI, values);
-         long locationRowId = ContentUris.parseId(locationUri);
-
-         // Verify we got a row back.
-         assertTrue(locationRowId != -1);
-         Log.d(LOG_TAG, "New row id: " + locationRowId);
-
-         ContentValues updatedValues = new ContentValues(values);
-         updatedValues.put(LocationEntry._ID, locationRowId);
-         updatedValues.put(LocationEntry.COLUMN_CITY_NAME, "Santa's Village");
-
-         int count = mContext.getContentResolver().update(
-                 LocationEntry.CONTENT_URI, updatedValues, LocationEntry._ID + "= ?",
-                 new String[] { Long.toString(locationRowId)});
-
-         assertEquals(count, 1);
-
-         // A cursor is your primary interface to the query results.
-         Cursor cursor = mContext.getContentResolver().query(
-                 LocationEntry.buildLocationUri(locationRowId),
-                 null,
-                 null, // Columns for the "where" clause
-                 null, // Values for the "where" clause
-                 null // sort order
-         );
-
-         TestDb.validateCursor(cursor, updatedValues);
-     }
-     */
-
-    static ContentValues createKalamazooWeatherValues(long locationRowId) {
-        ContentValues weatherValues = new ContentValues();
-        weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationRowId);
-        weatherValues.put(WeatherEntry.COLUMN_DATETEXT, KALAMAZOO_WEATHER_START_DATE);
-        weatherValues.put(WeatherEntry.COLUMN_DEGREES, 1.2);
-        weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, 1.5);
-        weatherValues.put(WeatherEntry.COLUMN_PRESSURE, 1.1);
-        weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, 85);
-        weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, 35);
-        weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, "Cats and Dogs");
-        weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, 3.4);
-        weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, 42);
-
-        return weatherValues;
-    }
-
-    // Helper Methods
-
-    static ContentValues createKalamazooLocationValues() {
-        // Create a new map of values, where column names are the keys
-        ContentValues testValues = new ContentValues();
-        testValues.put(LocationEntry.COLUMN_LOCATION_SETTING, KALAMAZOO_LOCATION_SETTING);
-        testValues.put(LocationEntry.COLUMN_CITY_NAME, "Kalamazoo");
-        testValues.put(LocationEntry.COLUMN_COORD_LAT, 42.2917);
-        testValues.put(LocationEntry.COLUMN_COORD_LONG, -85.5872);
-
-        return testValues;
-    }
 
     // brings our database to an empty state
     public void deleteAllRecords() {
@@ -217,19 +212,15 @@ public class TestProvider extends AndroidTestCase {
         assertEquals(0, cursor.getCount());
         cursor.close();
 
-         /* TODO Uncomment for
-         4b - Implement Location_ID queries
-         https://www.udacity.com/course/viewer#!/c-ud853/l-1576308909/e-1675098551/m-1675098552
-         cursor = mContext.getContentResolver().query(
-                 LocationEntry.CONTENT_URI,
-                 null,
-                 null,
-                 null,
-                 null
-         );
-         assertEquals(0, cursor.getCount());
-         cursor.close();
-         */
+        cursor = mContext.getContentResolver().query(
+                LocationEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        assertEquals(0, cursor.getCount());
+        cursor.close();
     }
 
     // Since we want each test to start with a clean slate, run deleteAllRecords
