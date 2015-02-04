@@ -15,23 +15,28 @@
  */
 package com.gfpacheco.sunshine;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+import android.util.Log;
+
+import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
+import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
+import com.gfpacheco.sunshine.data.WeatherDbHelper;
 
 public class TestDb extends AndroidTestCase {
 
     public static final String LOG_TAG = TestDb.class.getSimpleName();
 
-//    public void testCreateDb() throws Throwable {
-//        mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
-//        SQLiteDatabase db = new WeatherDbHelper(
-//                this.mContext).getWritableDatabase();
-//        assertEquals(true, db.isOpen());
-//        db.close();
-//    }
+    public void testCreateDb() throws Throwable {
+        mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
+        SQLiteDatabase db = new WeatherDbHelper(
+                this.mContext).getWritableDatabase();
+        assertEquals(true, db.isOpen());
+        db.close();
+    }
 
-    /* TODO Uncomment for
-    4a - JUnit testing
-    https://www.udacity.com/course/viewer#!/c-ud853/l-1639338560/m-1633698603
     public void testInsertReadDb() {
 
         // Test data we're going to insert into the DB to see if it works.
@@ -123,20 +128,15 @@ public class TestDb extends AndroidTestCase {
         weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, "Asteroids");
         weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, 5.5);
         weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, 321);
-        */
 
-    /**
-     * TODO YOUR CODE BELOW HERE FOR QUIZ
-     * QUIZ - 4a - InsertReadDbTest
-     * https://www.udacity.com/course/viewer#!/c-ud853/l-1639338560/e-1633698604/m-1633698605
-     **/
+        /**
+         * TODO YOUR CODE BELOW HERE FOR QUIZ
+         * QUIZ - 4a - InsertReadDbTest
+         * https://www.udacity.com/course/viewer#!/c-ud853/l-1639338560/e-1633698604/m-1633698605
+         **/
 
-        /* TODO Uncomment for
-        4a - JUnit testing
-        https://www.udacity.com/course/viewer#!/c-ud853/l-1639338560/m-1633698603
         dbHelper.close();
     }
-    */
 
     /* TODO Uncomment for
     4a - Simplify Tests
