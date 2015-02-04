@@ -19,6 +19,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
+import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
+
 /**
  * Manages a local database for weather data.
  */
@@ -42,9 +45,6 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_LOCATION_TABLE = "";
 
-        /* TODO Uncomment for
-         4a - Create a Database for SQLiteOpenHelper
-         https://www.udacity.com/course/viewer#!/c-ud853/l-1639338560/m-1633698598
         final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" +
                 // Why AutoIncrement here, and not above?
                 // Unique keys will be auto-generated in either case.  But for weather
@@ -78,7 +78,6 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL(SQL_CREATE_LOCATION_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE);
-        */
     }
 
     @Override
