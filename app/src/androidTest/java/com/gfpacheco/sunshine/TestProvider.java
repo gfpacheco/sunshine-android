@@ -23,8 +23,8 @@
 // import android.os.Build;
 // import android.test.AndroidTestCase;
 // import android.util.Log;
-// import com.example.android.sunshine.app.data.WeatherContract.LocationEntry;
-// import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
+// import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
+// import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
 
 // public class TestProvider extends AndroidTestCase {
 
@@ -166,40 +166,40 @@
 //         );
 //         TestDb.validateCursor(weatherCursor, weatherValues);
 //     }
-//	   */    
+//	   */
 
 
 //     /* TODO Uncomment for
 //     4b - Coding the Content Provider : getType()
 //     https://www.udacity.com/course/viewer#!/c-ud853/l-1576308909/e-1675098546/m-1675098547
 //     public void testGetType() {
-//         // content://com.example.android.sunshine.app/weather/
+//         // content://com.gfpacheco.sunshine/weather/
 //         String type = mContext.getContentResolver().getType(WeatherEntry.CONTENT_URI);
-//         // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+//         // vnd.android.cursor.dir/com.gfpacheco.sunshine/weather
 //         assertEquals(WeatherEntry.CONTENT_TYPE, type);
 
 //         String testLocation = "94074";
-//         // content://com.example.android.sunshine.app/weather/94074
+//         // content://com.gfpacheco.sunshine/weather/94074
 //         type = mContext.getContentResolver().getType(
 //                 WeatherEntry.buildWeatherLocation(testLocation));
-//         // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+//         // vnd.android.cursor.dir/com.gfpacheco.sunshine/weather
 //         assertEquals(WeatherEntry.CONTENT_TYPE, type);
 
 //         String testDate = "20140612";
-//         // content://com.example.android.sunshine.app/weather/94074/20140612
+//         // content://com.gfpacheco.sunshine/weather/94074/20140612
 //         type = mContext.getContentResolver().getType(
 //                 WeatherEntry.buildWeatherLocationWithDate(testLocation, testDate));
-//         // vnd.android.cursor.item/com.example.android.sunshine.app/weather
+//         // vnd.android.cursor.item/com.gfpacheco.sunshine/weather
 //         assertEquals(WeatherEntry.CONTENT_ITEM_TYPE, type);
 
-//         // content://com.example.android.sunshine.app/location/
+//         // content://com.gfpacheco.sunshine/location/
 //         type = mContext.getContentResolver().getType(LocationEntry.CONTENT_URI);
-//         // vnd.android.cursor.dir/com.example.android.sunshine.app/location
+//         // vnd.android.cursor.dir/com.gfpacheco.sunshine/location
 //         assertEquals(LocationEntry.CONTENT_TYPE, type);
 
-//         // content://com.example.android.sunshine.app/location/1
+//         // content://com.gfpacheco.sunshine/location/1
 //         type = mContext.getContentResolver().getType(LocationEntry.buildLocationUri(1L));
-//         // vnd.android.cursor.item/com.example.android.sunshine.app/location
+//         // vnd.android.cursor.item/com.gfpacheco.sunshine/location
 //         assertEquals(LocationEntry.CONTENT_ITEM_TYPE, type);
 //     }
 //     */

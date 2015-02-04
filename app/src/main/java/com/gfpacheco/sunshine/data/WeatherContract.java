@@ -24,7 +24,7 @@ import android.provider.BaseColumns;
  */
 public class WeatherContract {
 
-    public static final String CONTENT_AUTHORITY = "com.gfpacheco.sunshine.app";
+    public static final String CONTENT_AUTHORITY = "com.gfpacheco.sunshine";
 
     // Use CONTENT_AUTHORITY to create the base of all URI's which apps will use to contact
     // the content provider.
@@ -32,8 +32,8 @@ public class WeatherContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     // Possible paths (appended to base content URI for possible URI's)
-    // For instance, content://com.gfpacheco.sunshine.app/weather/ is a valid path for
-    // looking at weather data. content://com.gfpacheco.sunshine.app/givemeroot/ will fail,
+    // For instance, content://com.gfpacheco.sunshine/weather/ is a valid path for
+    // looking at weather data. content://com.gfpacheco.sunshine/givemeroot/ will fail,
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
 
@@ -166,12 +166,12 @@ public class WeatherContract {
                     .appendQueryParameter(COLUMN_DATETEXT, startDate).build();
         }
 
-        public static final String CONTENT_TYPE =
-                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
-
         public static Uri buildWeatherLocationWithDate(String locationSetting, String date) {
             return CONTENT_URI.buildUpon().appendPath(locationSetting).appendPath(date).build();
         }
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
 
         public static String getLocationSettingFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
@@ -181,12 +181,12 @@ public class WeatherContract {
             return uri.getPathSegments().get(2);
         }
 
-        public static final String CONTENT_ITEM_TYPE =
-                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
-
         public static String getStartDateFromUri(Uri uri) {
             return uri.getQueryParameter(COLUMN_DATETEXT);
         }
+
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
 
 
     }
