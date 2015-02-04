@@ -114,7 +114,6 @@ public class WeatherContract {
         public static final String CONTENT_ITEM_TYPE =
                 "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
 
-
     }
 
     /*
@@ -161,21 +160,18 @@ public class WeatherContract {
             return CONTENT_URI.buildUpon().appendPath(locationSetting).build();
         }
 
-        public static final String CONTENT_TYPE =
-                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
-
         public static Uri buildWeatherLocationWithStartDate(
                 String locationSetting, String startDate) {
             return CONTENT_URI.buildUpon().appendPath(locationSetting)
                     .appendQueryParameter(COLUMN_DATETEXT, startDate).build();
         }
 
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
+
         public static Uri buildWeatherLocationWithDate(String locationSetting, String date) {
             return CONTENT_URI.buildUpon().appendPath(locationSetting).appendPath(date).build();
         }
-
-        public static final String CONTENT_ITEM_TYPE =
-                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
 
         public static String getLocationSettingFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
@@ -184,6 +180,9 @@ public class WeatherContract {
         public static String getDateFromUri(Uri uri) {
             return uri.getPathSegments().get(2);
         }
+
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
 
         public static String getStartDateFromUri(Uri uri) {
             return uri.getQueryParameter(COLUMN_DATETEXT);
