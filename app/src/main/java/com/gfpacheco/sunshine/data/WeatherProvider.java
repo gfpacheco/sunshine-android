@@ -176,19 +176,16 @@ public class WeatherProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            case WEATHER_WITH_LOCATION_AND_DATE:
-                return WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE;
-            case WEATHER_WITH_LOCATION:
-                return WeatherContract.WeatherEntry.CONTENT_TYPE;
             case WEATHER:
                 return WeatherContract.WeatherEntry.CONTENT_TYPE;
-
-            /**
-             * TODO YOUR CODE BELOW HERE FOR QUIZ
-             * QUIZ - 4b - Coding the Content Provider : getType
-             * https://www.udacity.com/course/viewer#!/c-ud853/l-1576308909/e-1675098546/m-1675098547
-             **/
-
+            case WEATHER_WITH_LOCATION:
+                return WeatherContract.WeatherEntry.CONTENT_TYPE;
+            case WEATHER_WITH_LOCATION_AND_DATE:
+                return WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE;
+            case LOCATION:
+                return WeatherContract.LocationEntry.CONTENT_TYPE;
+            case LOCATION_ID:
+                return WeatherContract.LocationEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
