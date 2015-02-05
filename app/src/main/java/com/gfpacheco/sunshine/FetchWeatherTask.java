@@ -1,12 +1,17 @@
 package com.gfpacheco.sunshine;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+
+import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,6 +81,33 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         return roundedHigh + "/" + roundedLow;
     }
 
+    private long addLocation(String locationSetting, String cityName, double lat, double lon) {
+        Cursor cursor = mContext.getContentResolver().query(
+                LocationEntry.CONTENT_URI,
+                new String[]{LocationEntry._ID},
+                LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
+                new String[]{locationSetting},
+                null);
+
+        if (cursor.moveToFirst()) {
+            int locationIdIndex = cursor.getColumnIndex(LocationEntry._ID);
+            return cursor.getLong(locationIdIndex);
+        } else {
+            ContentValues values = new ContentValues();
+            values.put(LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
+            values.put(LocationEntry.COLUMN_CITY_NAME, cityName);
+            values.put(LocationEntry.COLUMN_COORD_LAT, lat);
+            values.put(LocationEntry.COLUMN_COORD_LONG, lon);
+
+            Uri locationInsertUri = mContext.getContentResolver().insert(
+                    LocationEntry.CONTENT_URI,
+                    values
+            );
+
+            return ContentUris.parseId(locationInsertUri);
+        }
+    }
+
     /**
      * Take the String representing the complete forecast in JSON Format and
      * pull out the data we need to construct the Strings needed for the wireframes.
@@ -83,10 +115,19 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays, String locationSetting)
             throws JSONException {
 
+
         // These are the names of the JSON objects that need to be extracted.
+
+        // Location information
+        final String OWM_CITY = "city";
+        final String OWM_CITY_NAME = "name";
+        final String OWM_COORD = "coord";
+        final String OWM_COORD_LAT = "lat";
+        final String OWM_COORD_LONG = "lon";
+
         final String OWM_LIST = "list";
         final String OWM_WEATHER = "weather";
         final String OWM_TEMPERATURE = "temp";
@@ -97,6 +138,17 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
         JSONObject forecastJson = new JSONObject(forecastJsonStr);
         JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
+
+        JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
+        String cityName = cityJson.getString(OWM_CITY_NAME);
+        JSONObject coordJSON = cityJson.getJSONObject(OWM_COORD);
+        double cityLatitude = coordJSON.getLong(OWM_COORD_LAT);
+        double cityLongitude = coordJSON.getLong(OWM_COORD_LONG);
+
+        Log.v(LOG_TAG, cityName + ", with coord: " + cityLatitude + " " + cityLongitude);
+
+        // Insert the location into the database.
+        long locationID = addLocation(locationSetting, cityName, cityLatitude, cityLongitude);
 
         String[] resultStrs = new String[numDays];
         for (int i = 0; i < weatherArray.length(); i++) {
@@ -136,6 +188,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         if (params.length == 0) {
             return null;
         }
+        String locationQuery = params[0];
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -153,7 +206,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
                     .appendQueryParameter(FORECAST_FORMAT_PARAM, FORECAST_FORMAT)
                     .appendQueryParameter(FORECAST_UNITS_PARAM, FORECAST_UNITS)
                     .appendQueryParameter(FORECAST_DAYS_PARAM, Integer.toString(FORECAST_DAYS))
-                    .appendQueryParameter(FORECAST_QUERY_PARAM, params[0])
+                    .appendQueryParameter(FORECAST_QUERY_PARAM, locationQuery)
                     .build();
 
             URL url = new URL(uri.toString());
@@ -204,7 +257,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         }
 
         try {
-            return getWeatherDataFromJson(forecastJsonStr, FORECAST_DAYS);
+            return getWeatherDataFromJson(forecastJsonStr, FORECAST_DAYS, locationQuery);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
