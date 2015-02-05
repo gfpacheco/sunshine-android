@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,15 +17,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.gfpacheco.sunshine.data.WeatherContract;
 import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
 import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
-import com.gfpacheco.sunshine.utils.SharedPreferencesUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -48,7 +47,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int COL_LOCATION_SETTING = 5;
 
     private String mLocation;
-    private ArrayAdapter<String> mWeekForecastAdapter;
+    private SimpleCursorAdapter mWeekForecastAdapter;
 
     public ForecastFragment() {
     }
@@ -89,8 +88,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateWeather() {
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity(), mWeekForecastAdapter);
-        String location = SharedPreferencesUtils.getSharedStringPreference(
+        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
+        String location = Utils.getSharedStringPreference(
                 getActivity(),
                 R.string.pref_location_key,
                 R.string.pref_location_default
@@ -103,20 +102,59 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mWeekForecastAdapter = new ArrayAdapter<>(
+        mWeekForecastAdapter = new SimpleCursorAdapter(
                 getActivity(),
                 R.layout.list_item_forecast,
-                R.id.list_item_forecast_text_view,
-                new ArrayList<String>());
+                null,
+                new String[]{
+                        WeatherContract.WeatherEntry.COLUMN_DATETEXT,
+                        WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+                        WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+                        WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
+                },
+                new int[]{R.id.list_item_date_text_view,
+                        R.id.list_item_forecast_text_view,
+                        R.id.list_item_high_text_view,
+                        R.id.list_item_low_text_view
+                },
+                0
+        );
+
+        mWeekForecastAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                boolean isMetric = Utils.getSharedStringPreference(
+                        getActivity(),
+                        R.string.pref_units_key,
+                        R.string.pref_units_metric
+                ).equals(getString(R.string.pref_units_metric));
+
+                switch (columnIndex) {
+                    case COL_WEATHER_MAX_TEMP:
+                    case COL_WEATHER_MIN_TEMP: {
+                        // we have to do some formatting and possibly a conversion
+                        ((TextView) view).setText(Utils.formatTemperature(
+                                cursor.getDouble(columnIndex), isMetric));
+                        return true;
+                    }
+                    case COL_WEATHER_DATETEXT: {
+                        String dateString = cursor.getString(columnIndex);
+                        TextView dateView = (TextView) view;
+                        dateView.setText(Utils.formatDate(dateString));
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
 
         ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
         listView.setAdapter(mWeekForecastAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String forecast = mWeekForecastAdapter.getItem(position);
                 Intent intent = new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, forecast);
+                        .putExtra(Intent.EXTRA_TEXT, "placeholder");
                 startActivity(intent);
             }
         });
@@ -129,7 +167,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         final String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
 
         String startDate = WeatherContract.getDbDateString(new Date());
-        mLocation = SharedPreferencesUtils.getSharedStringPreference(
+        mLocation = Utils.getSharedStringPreference(
                 getActivity(),
                 R.string.pref_location_key,
                 R.string.pref_location_default
@@ -152,11 +190,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        mWeekForecastAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        mWeekForecastAdapter.swapCursor(null);
     }
 }

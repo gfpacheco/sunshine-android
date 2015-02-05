@@ -7,12 +7,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import com.gfpacheco.sunshine.data.WeatherContract;
 import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
 import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
-import com.gfpacheco.sunshine.utils.SharedPreferencesUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,10 +22,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
+public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
@@ -41,46 +38,9 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
     private final int FORECAST_DAYS = 14;
 
     private final Context mContext;
-    private ArrayAdapter<String> mForecastAdapter;
 
-    public FetchWeatherTask(Context context, ArrayAdapter<String> forecastAdapter) {
+    public FetchWeatherTask(Context context) {
         mContext = context;
-        mForecastAdapter = forecastAdapter;
-    }
-
-    /* The date/time conversion code is going to be moved outside the asynctask later,
-         * so for convenience we're breaking it out into its own method now.
-         */
-    private String getReadableDateString(long time) {
-        // Because the API returns a unix timestamp (measured in seconds),
-        // it must be converted to milliseconds in order to be converted to valid date.
-        Date date = new Date(time * 1000);
-        return new SimpleDateFormat("E, MMM d").format(date);
-    }
-
-    private double convertCelsiusToFahrenheit(double celsius) {
-        return (celsius * 1.8) + 32;
-    }
-
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
-    private String formatHighLows(double high, double low) {
-        String units = SharedPreferencesUtils.getSharedStringPreference(
-                mContext,
-                R.string.pref_units_key,
-                R.string.pref_units_metric
-        );
-
-        if (units.equals(mContext.getString(R.string.pref_units_imperial))) {
-            high = convertCelsiusToFahrenheit(high);
-            low = convertCelsiusToFahrenheit(low);
-        }
-        // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
-
-        return roundedHigh + "/" + roundedLow;
     }
 
     private long addLocation(String locationSetting, String cityName, double lat, double lon) {
@@ -117,7 +77,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays, String locationSetting)
+    private void getWeatherDataFromJson(String forecastJsonStr, int numDays, String locationSetting)
             throws JSONException {
 
 
@@ -157,13 +117,10 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         double cityLatitude = coordJSON.getLong(OWM_COORD_LAT);
         double cityLongitude = coordJSON.getLong(OWM_COORD_LONG);
 
-        Log.v(LOG_TAG, cityName + ", with coord: " + cityLatitude + " " + cityLongitude);
-
         // Insert the location into the database.
         long locationID = addLocation(locationSetting, cityName, cityLatitude, cityLongitude);
 
         ContentValues[] valueses = new ContentValues[numDays];
-        String[] resultStrs = new String[numDays];
         for (int i = 0; i < weatherArray.length(); i++) {
             // These are the values that will be collected.
             long dateTime;
@@ -219,19 +176,13 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherId);
 
             valueses[i] = weatherValues;
-
-            String highAndLow = formatHighLows(high, low);
-            String day = getReadableDateString(dateTime);
-            resultStrs[i] = day + " - " + description + " - " + highAndLow;
         }
 
         mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, valueses);
-
-        return resultStrs;
     }
 
     @Override
-    protected String[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         if (params.length == 0) {
             return null;
         }
@@ -304,7 +255,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         }
 
         try {
-            return getWeatherDataFromJson(forecastJsonStr, FORECAST_DAYS, locationQuery);
+            getWeatherDataFromJson(forecastJsonStr, FORECAST_DAYS, locationQuery);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -313,14 +264,4 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         return null;
     }
 
-    @Override
-    protected void onPostExecute(String[] weekForecast) {
-        if (weekForecast != null) {
-            mForecastAdapter.clear();
-
-            for (String dayForecast : weekForecast) {
-                mForecastAdapter.add(dayForecast);
-            }
-        }
-    }
 }
