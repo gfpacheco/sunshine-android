@@ -35,4 +35,13 @@ public class Utils {
         return DateFormat.getDateInstance().format(date);
     }
 
+    public static boolean isMetricsUnits(Context context) {
+        String units = getSharedStringPreference(
+                context,
+                R.string.pref_units_key,
+                R.string.pref_units_metric
+        );
+
+        return units.equals(context.getString(R.string.pref_units_metric));
+    }
 }

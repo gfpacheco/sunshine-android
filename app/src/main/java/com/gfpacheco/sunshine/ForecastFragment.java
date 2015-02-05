@@ -123,11 +123,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mWeekForecastAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             @Override
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                boolean isMetric = Utils.getSharedStringPreference(
-                        getActivity(),
-                        R.string.pref_units_key,
-                        R.string.pref_units_metric
-                ).equals(getString(R.string.pref_units_metric));
+                boolean isMetric = Utils.isMetricsUnits(getActivity());
 
                 switch (columnIndex) {
                     case COL_WEATHER_MAX_TEMP:
@@ -153,9 +149,22 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, "placeholder");
-                startActivity(intent);
+                Cursor cursor = mWeekForecastAdapter.getCursor();
+                if (cursor != null && cursor.moveToPosition(position)) {
+                    String dateString = Utils.formatDate(cursor.getString(COL_WEATHER_DATETEXT));
+                    String weatherDescription = cursor.getString(COL_WEATHER_SHORT_DESC);
+
+                    boolean isMetric = Utils.isMetricsUnits(getActivity());
+                    String high = Utils.formatTemperature(cursor.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
+                    String low = Utils.formatTemperature(cursor.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
+
+                    Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(
+                            Intent.EXTRA_TEXT,
+                            String.format("%s - %s - %s/%s", dateString, weatherDescription, high, low)
+                    );
+
+                    startActivity(intent);
+                }
             }
         });
 
