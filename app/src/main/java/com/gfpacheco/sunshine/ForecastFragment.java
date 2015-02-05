@@ -148,16 +148,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = mWeekForecastAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    String dateString = Utils.formatDate(cursor.getString(COL_WEATHER_DATETEXT));
-                    String weatherDescription = cursor.getString(COL_WEATHER_SHORT_DESC);
-
-                    boolean isMetric = Utils.isMetricsUnits(getActivity());
-                    String high = Utils.formatTemperature(cursor.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
-                    String low = Utils.formatTemperature(cursor.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
-
                     Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(
                             Intent.EXTRA_TEXT,
-                            String.format("%s - %s - %s/%s", dateString, weatherDescription, high, low)
+                            cursor.getString(COL_WEATHER_DATETEXT)
                     );
 
                     startActivity(intent);
