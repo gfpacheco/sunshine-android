@@ -70,9 +70,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        updateWeather();
+    public void onResume() {
+        super.onResume();
+        if (mLocation != null && !mLocation.equals(Utils.getLocationPreference(getActivity()))) {
+            getLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
+        }
     }
 
     @Override
@@ -89,12 +91,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void updateWeather() {
         FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
-        String location = Utils.getSharedStringPreference(
-                getActivity(),
-                R.string.pref_location_key,
-                R.string.pref_location_default
-        );
-        weatherTask.execute(location);
+        weatherTask.execute(mLocation);
     }
 
     @Override
@@ -176,11 +173,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         final String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
 
         String startDate = WeatherContract.getDbDateString(new Date());
-        mLocation = Utils.getSharedStringPreference(
-                getActivity(),
-                R.string.pref_location_key,
-                R.string.pref_location_default
-        );
+        mLocation = Utils.getLocationPreference(getActivity());
 
         Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(
                 mLocation,

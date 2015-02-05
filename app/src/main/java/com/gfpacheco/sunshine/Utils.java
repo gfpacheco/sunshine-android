@@ -20,19 +20,12 @@ public class Utils {
         );
     }
 
-    static String formatTemperature(double temperature, boolean isMetric) {
-        double temp;
-        if (!isMetric) {
-            temp = temperature * 1.8 + 32;
-        } else {
-            temp = temperature;
-        }
-        return String.format("%.0f", temp);
-    }
-
-    static String formatDate(String dateString) {
-        Date date = WeatherContract.getDateFromDb(dateString);
-        return DateFormat.getDateInstance().format(date);
+    public static String getLocationPreference(Context context) {
+        return getSharedStringPreference(
+                context,
+                R.string.pref_location_key,
+                R.string.pref_location_default
+        );
     }
 
     public static boolean isMetricsUnits(Context context) {
@@ -43,5 +36,20 @@ public class Utils {
         );
 
         return units.equals(context.getString(R.string.pref_units_metric));
+    }
+
+    public static String formatTemperature(double temperature, boolean isMetric) {
+        double temp;
+        if (!isMetric) {
+            temp = temperature * 1.8 + 32;
+        } else {
+            temp = temperature;
+        }
+        return String.format("%.0f", temp);
+    }
+
+    public static String formatDate(String dateString) {
+        Date date = WeatherContract.getDateFromDb(dateString);
+        return DateFormat.getDateInstance().format(date);
     }
 }
