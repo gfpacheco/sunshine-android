@@ -1,9 +1,14 @@
 package com.gfpacheco.sunshine;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,13 +19,44 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.gfpacheco.sunshine.data.WeatherContract;
+import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
+import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
+import com.gfpacheco.sunshine.utils.SharedPreferencesUtils;
+
 import java.util.ArrayList;
+import java.util.Date;
 
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private ArrayAdapter<String> weekForecastAdapter;
+    private static final int FORECAST_LOADER_ID = 0;
+
+    private static final String[] FORECAST_COLUMNS = {
+            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+            WeatherEntry.COLUMN_DATETEXT,
+            WeatherEntry.COLUMN_SHORT_DESC,
+            WeatherEntry.COLUMN_MIN_TEMP,
+            WeatherEntry.COLUMN_MAX_TEMP,
+            LocationEntry.COLUMN_LOCATION_SETTING
+    };
+
+    private static final int COL_WEATHER_ID = 0;
+    private static final int COL_WEATHER_DATETEXT = 1;
+    private static final int COL_WEATHER_SHORT_DESC = 2;
+    private static final int COL_WEATHER_MIN_TEMP = 3;
+    private static final int COL_WEATHER_MAX_TEMP = 4;
+    private static final int COL_LOCATION_SETTING = 5;
+
+    private String mLocation;
+    private ArrayAdapter<String> mWeekForecastAdapter;
 
     public ForecastFragment() {
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(FORECAST_LOADER_ID, null, this);
     }
 
     @Override
@@ -53,9 +89,12 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateWeather() {
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity(), weekForecastAdapter);
-        String location = PreferenceManager.getDefaultSharedPreferences(getActivity())
-                .getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity(), mWeekForecastAdapter);
+        String location = SharedPreferencesUtils.getSharedStringPreference(
+                getActivity(),
+                R.string.pref_location_key,
+                R.string.pref_location_default
+        );
         weatherTask.execute(location);
     }
 
@@ -64,18 +103,18 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        weekForecastAdapter = new ArrayAdapter<>(
+        mWeekForecastAdapter = new ArrayAdapter<>(
                 getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_text_view,
                 new ArrayList<String>());
 
         ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
-        listView.setAdapter(weekForecastAdapter);
+        listView.setAdapter(mWeekForecastAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String forecast = weekForecastAdapter.getItem(position);
+                String forecast = mWeekForecastAdapter.getItem(position);
                 Intent intent = new Intent(getActivity(), DetailActivity.class)
                         .putExtra(Intent.EXTRA_TEXT, forecast);
                 startActivity(intent);
@@ -85,4 +124,39 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        final String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
+
+        String startDate = WeatherContract.getDbDateString(new Date());
+        mLocation = SharedPreferencesUtils.getSharedStringPreference(
+                getActivity(),
+                R.string.pref_location_key,
+                R.string.pref_location_default
+        );
+
+        Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(
+                mLocation,
+                startDate
+        );
+
+        return new CursorLoader(
+                getActivity(),
+                weatherForLocationUri,
+                FORECAST_COLUMNS,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 }

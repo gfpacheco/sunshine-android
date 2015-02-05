@@ -3,17 +3,16 @@ package com.gfpacheco.sunshine;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.gfpacheco.sunshine.data.WeatherContract;
 import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
 import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
+import com.gfpacheco.sunshine.utils.SharedPreferencesUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,10 +66,11 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
      * Prepare the weather high/lows for presentation.
      */
     private String formatHighLows(double high, double low) {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String units = sharedPrefs.getString(
-                mContext.getString(R.string.pref_units_key),
-                mContext.getString(R.string.pref_units_metric));
+        String units = SharedPreferencesUtils.getSharedStringPreference(
+                mContext,
+                R.string.pref_units_key,
+                R.string.pref_units_metric
+        );
 
         if (units.equals(mContext.getString(R.string.pref_units_imperial))) {
             high = convertCelsiusToFahrenheit(high);
