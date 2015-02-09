@@ -164,7 +164,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             ContentValues weatherValues = new ContentValues();
 
             weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationID);
-            weatherValues.put(WeatherEntry.COLUMN_DATETEXT,
+            weatherValues.put(WeatherEntry.COLUMN_DATE_TEXT,
                     WeatherContract.getDbDateString(new Date(dateTime * 1000L)));
             weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, humidity);
             weatherValues.put(WeatherEntry.COLUMN_PRESSURE, pressure);
@@ -216,7 +216,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
             // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             if (inputStream == null) {
                 // Nothing to do.
                 return null;
@@ -228,7 +228,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                 // But it does make debugging a *lot* easier if you print out the completed
                 // buffer for debugging.
-                buffer.append(line + "\n");
+                buffer.append(line).append("\n");
             }
 
             if (buffer.length() == 0) {

@@ -29,7 +29,6 @@ import java.util.Set;
 
 public class TestDb extends AndroidTestCase {
 
-    public static final String LOG_TAG = TestDb.class.getSimpleName();
     static final String TEST_LOCATION = "99705";
     static final String TEST_DATE = "20141205";
 
@@ -47,7 +46,7 @@ public class TestDb extends AndroidTestCase {
     static ContentValues createWeatherValues(long locationRowId) {
         ContentValues weatherValues = new ContentValues();
         weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationRowId);
-        weatherValues.put(WeatherEntry.COLUMN_DATETEXT, "20141205");
+        weatherValues.put(WeatherEntry.COLUMN_DATE_TEXT, "20141205");
         weatherValues.put(WeatherEntry.COLUMN_DEGREES, 1.1);
         weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, 1.2);
         weatherValues.put(WeatherEntry.COLUMN_PRESSURE, 1.3);

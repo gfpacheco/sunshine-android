@@ -28,24 +28,21 @@ import java.util.Date;
 
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    public static final int COL_WEATHER_ID = 0;
+    public static final int COL_WEATHER_DATE_TEXT = 1;
+    public static final int COL_WEATHER_SHORT_DESC = 2;
+    public static final int COL_WEATHER_MIN_TEMP = 3;
+    public static final int COL_WEATHER_MAX_TEMP = 4;
+    public static final int COL_LOCATION_SETTING = 5;
     private static final int FORECAST_LOADER_ID = 0;
-
     private static final String[] FORECAST_COLUMNS = {
             WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
-            WeatherEntry.COLUMN_DATETEXT,
+            WeatherEntry.COLUMN_DATE_TEXT,
             WeatherEntry.COLUMN_SHORT_DESC,
             WeatherEntry.COLUMN_MIN_TEMP,
             WeatherEntry.COLUMN_MAX_TEMP,
             LocationEntry.COLUMN_LOCATION_SETTING
     };
-
-    private static final int COL_WEATHER_ID = 0;
-    private static final int COL_WEATHER_DATETEXT = 1;
-    private static final int COL_WEATHER_SHORT_DESC = 2;
-    private static final int COL_WEATHER_MIN_TEMP = 3;
-    private static final int COL_WEATHER_MAX_TEMP = 4;
-    private static final int COL_LOCATION_SETTING = 5;
-
     private String mLocation;
     private SimpleCursorAdapter mWeekForecastAdapter;
 
@@ -104,7 +101,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 R.layout.list_item_forecast,
                 null,
                 new String[]{
-                        WeatherContract.WeatherEntry.COLUMN_DATETEXT,
+                        WeatherContract.WeatherEntry.COLUMN_DATE_TEXT,
                         WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
                         WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
                         WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
@@ -130,7 +127,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                                 cursor.getDouble(columnIndex), isMetric));
                         return true;
                     }
-                    case COL_WEATHER_DATETEXT: {
+                    case COL_WEATHER_DATE_TEXT: {
                         String dateString = cursor.getString(columnIndex);
                         TextView dateView = (TextView) view;
                         dateView.setText(Utils.formatDate(dateString));
@@ -150,7 +147,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 if (cursor != null && cursor.moveToPosition(position)) {
                     Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(
                             Intent.EXTRA_TEXT,
-                            cursor.getString(COL_WEATHER_DATETEXT)
+                            cursor.getString(COL_WEATHER_DATE_TEXT)
                     );
 
                     startActivity(intent);
@@ -163,7 +160,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
+        final String sortOrder = WeatherEntry.COLUMN_DATE_TEXT + " ASC";
 
         String startDate = WeatherContract.getDbDateString(new Date());
         mLocation = Utils.getLocationPreference(getActivity());

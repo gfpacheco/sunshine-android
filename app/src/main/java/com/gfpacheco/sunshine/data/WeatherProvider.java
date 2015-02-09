@@ -23,6 +23,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 public class WeatherProvider extends ContentProvider {
 
@@ -52,11 +53,11 @@ public class WeatherProvider extends ContentProvider {
     private static final String sLocationSettingWithStartDateSelection =
             WeatherContract.LocationEntry.TABLE_NAME +
                     "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
-                    WeatherContract.WeatherEntry.COLUMN_DATETEXT + " >= ? ";
+                    WeatherContract.WeatherEntry.COLUMN_DATE_TEXT + " >= ? ";
     private static final String sLocationSettingAndDaySelection =
             WeatherContract.LocationEntry.TABLE_NAME +
                     "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
-                    WeatherContract.WeatherEntry.COLUMN_DATETEXT + " = ? ";
+                    WeatherContract.WeatherEntry.COLUMN_DATE_TEXT + " = ? ";
     private static final String sLocationByIdSelection =
             WeatherContract.LocationEntry._ID + " = ? ";
     private WeatherDbHelper mOpenHelper;
@@ -298,7 +299,7 @@ public class WeatherProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {

@@ -110,7 +110,7 @@ public class WeatherContract {
         // Column with the foreign key into the location table.
         public static final String COLUMN_LOC_KEY = "location_id";
         // Date, stored as Text with format yyyy-MM-dd
-        public static final String COLUMN_DATETEXT = "date";
+        public static final String COLUMN_DATE_TEXT = "date";
         // Weather id as returned by API, to identify the icon to be used
         public static final String COLUMN_WEATHER_ID = "weather_id";
 
@@ -148,7 +148,7 @@ public class WeatherContract {
         public static Uri buildWeatherLocationWithStartDate(
                 String locationSetting, String startDate) {
             return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendQueryParameter(COLUMN_DATETEXT, startDate).build();
+                    .appendQueryParameter(COLUMN_DATE_TEXT, startDate).build();
         }
 
         public static Uri buildWeatherLocationWithDate(String locationSetting, String date) {
@@ -159,16 +159,16 @@ public class WeatherContract {
             return uri.getPathSegments().get(1);
         }
 
-        public static final String CONTENT_TYPE =
-                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
-
         public static String getDateFromUri(Uri uri) {
             return uri.getPathSegments().get(2);
         }
 
         public static String getStartDateFromUri(Uri uri) {
-            return uri.getQueryParameter(COLUMN_DATETEXT);
+            return uri.getQueryParameter(COLUMN_DATE_TEXT);
         }
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_WEATHER;
 
 
         public static final String CONTENT_ITEM_TYPE =
