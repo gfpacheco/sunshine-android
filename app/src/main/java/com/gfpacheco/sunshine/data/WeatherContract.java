@@ -132,7 +132,7 @@ public class WeatherContract {
         public static final String COLUMN_WIND_SPEED = "wind";
 
         // Degrees are meteorological degrees (e.g, 0 is north, 180 is south).  Stored as floats.
-        public static final String COLUMN_DEGREES = "degrees";
+        public static final String COLUMN_WIND_DEGREES = "degrees";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_WEATHER).build();

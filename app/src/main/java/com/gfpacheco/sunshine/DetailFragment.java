@@ -36,13 +36,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
             WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
             WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
+            WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
+            WeatherContract.WeatherEntry.COLUMN_WIND_DEGREES,
+            WeatherContract.WeatherEntry.COLUMN_PRESSURE,
             WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING
     };
 
-    private static final int COL_WEATHER_DATETEXT = 1;
+    private static final int COL_WEATHER_DATE_TEXT = 1;
     private static final int COL_WEATHER_SHORT_DESC = 2;
     private static final int COL_WEATHER_MIN_TEMP = 3;
     private static final int COL_WEATHER_MAX_TEMP = 4;
+    private static final int COL_WEATHER_HUMIDITY = 5;
+    private static final int COL_WEATHER_WIND_SPEED = 6;
+    private static final int COL_WEATHER_WIND_DEGREES = 7;
+    private static final int COL_WEATHER_PRESSURE = 8;
 
     private String mLocation;
     private String mForecast;
@@ -131,10 +139,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         FragmentActivity activity = getActivity();
         boolean isMetric = Utils.isMetricsUnits(activity);
         updateView(
-                Utils.formatDate(data.getString(COL_WEATHER_DATETEXT)),
+                Utils.formatDate(data.getString(COL_WEATHER_DATE_TEXT)),
                 data.getString(COL_WEATHER_SHORT_DESC),
                 Utils.formatTemperature(activity, data.getDouble(COL_WEATHER_MAX_TEMP), isMetric),
-                Utils.formatTemperature(activity, data.getDouble(COL_WEATHER_MIN_TEMP), isMetric)
+                Utils.formatTemperature(activity, data.getDouble(COL_WEATHER_MIN_TEMP), isMetric),
+                activity.getString(R.string.format_humidity, data.getFloat(COL_WEATHER_HUMIDITY)),
+                Utils.formatWind(activity, data.getFloat(COL_WEATHER_WIND_SPEED), data.getFloat(COL_WEATHER_WIND_DEGREES)),
+                activity.getString(R.string.format_pressure, data.getFloat(COL_WEATHER_PRESSURE))
         );
 
         if (mShareActionProvider != null) {
@@ -142,12 +153,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
-    private void updateView(String dateText, String forecast, String high, String low) {
+    private void updateView(String dateText, String forecast, String high,
+                            String low, String humidity, String wind, String pressure) {
         Activity activity = getActivity();
         ((TextView) activity.findViewById(R.id.detail_date_text_view)).setText(dateText);
         ((TextView) activity.findViewById(R.id.detail_forecast_text_view)).setText(forecast);
         ((TextView) activity.findViewById(R.id.detail_high_text_view)).setText(high);
         ((TextView) activity.findViewById(R.id.detail_low_text_view)).setText(low);
+        ((TextView) activity.findViewById(R.id.detail_humidity_text_view)).setText(humidity);
+        ((TextView) activity.findViewById(R.id.detail_wind_text_view)).setText(wind);
+        ((TextView) activity.findViewById(R.id.detail_pressure_text_view)).setText(pressure);
         mForecast = String.format("%s - %s - %s/%s", dateText, forecast, high, low);
     }
 
