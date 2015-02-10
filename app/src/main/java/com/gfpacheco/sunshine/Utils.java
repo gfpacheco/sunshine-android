@@ -45,14 +45,14 @@ public class Utils {
         return units.equals(context.getString(R.string.pref_units_metric));
     }
 
-    public static String formatTemperature(double temperature, boolean isMetric) {
+    public static String formatTemperature(Context context, double temperature, boolean isMetric) {
         double temp;
         if (!isMetric) {
             temp = temperature * 1.8 + 32;
         } else {
             temp = temperature;
         }
-        return String.format("%.0f", temp);
+        return context.getString(R.string.format_temperature, temp);
     }
 
     public static String formatDate(String dateString) {
@@ -156,8 +156,7 @@ public class Utils {
         try {
             Date inputDate = DB_DATE_FORMATTER.parse(dateStr);
             SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd");
-            String monthDayString = monthDayFormat.format(inputDate);
-            return monthDayString;
+            return monthDayFormat.format(inputDate);
         } catch (ParseException e) {
             e.printStackTrace();
             return null;

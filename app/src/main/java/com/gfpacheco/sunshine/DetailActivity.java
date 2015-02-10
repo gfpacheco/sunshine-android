@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -165,12 +166,13 @@ public class DetailActivity extends ActionBarActivity {
                 return;
             }
 
-            boolean isMetric = Utils.isMetricsUnits(getActivity());
+            FragmentActivity activity = getActivity();
+            boolean isMetric = Utils.isMetricsUnits(activity);
             updateView(
                     Utils.formatDate(data.getString(COL_WEATHER_DATETEXT)),
                     data.getString(COL_WEATHER_SHORT_DESC),
-                    Utils.formatTemperature(data.getDouble(COL_WEATHER_MAX_TEMP), isMetric),
-                    Utils.formatTemperature(data.getDouble(COL_WEATHER_MIN_TEMP), isMetric)
+                    Utils.formatTemperature(activity, data.getDouble(COL_WEATHER_MAX_TEMP), isMetric),
+                    Utils.formatTemperature(activity, data.getDouble(COL_WEATHER_MIN_TEMP), isMetric)
             );
 
             if (mShareActionProvider != null) {
