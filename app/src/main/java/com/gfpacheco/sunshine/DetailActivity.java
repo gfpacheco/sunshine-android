@@ -189,7 +189,6 @@ public class DetailActivity extends ActionBarActivity {
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-            updateView(null, null, null, null);
         }
     }
 }
