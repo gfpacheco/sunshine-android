@@ -35,40 +35,62 @@ public class ForecastAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         int viewType = getItemViewType(cursor.getPosition());
 
-        return LayoutInflater.from(context).inflate(
+        View view = LayoutInflater.from(context).inflate(
                 (viewType == VIEW_TYPE_TODAY) ? R.layout.list_item_forecast_today : R.layout.list_item_forecast,
                 parent,
                 false
         );
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
+        return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         // Read weather icon ID from cursor
         // int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_ID);
         // Use placeholder image for now
-        ((ImageView) view.findViewById(R.id.list_item_icon)).setImageResource(R.drawable.ic_launcher);
+        viewHolder.iconView.setImageResource(R.drawable.ic_launcher);
 
         // Read date from cursor
         // Find TextView and set formatted date on it
-        ((TextView) view.findViewById(R.id.list_item_date_text_view))
+        viewHolder.dateView
                 .setText(Utils.getFriendlyDayString(context, cursor.getString(ForecastFragment.COL_WEATHER_DATE_TEXT)));
 
         // Read weather forecast from cursor
         // Find TextView and set weather forecast on it
-        ((TextView) view.findViewById(R.id.list_item_forecast_text_view))
-                .setText(cursor.getString(ForecastFragment.COL_WEATHER_SHORT_DESC));
+        viewHolder.shortDescView.setText(cursor.getString(ForecastFragment.COL_WEATHER_SHORT_DESC));
 
         // Read user preference for metric or imperial temperature units
         boolean isMetric = Utils.isMetricsUnits(context);
 
         // Read high temperature from cursor
-        ((TextView) view.findViewById(R.id.list_item_high_text_view))
+        viewHolder.highTempView
                 .setText(Utils.formatTemperature(cursor.getFloat(ForecastFragment.COL_WEATHER_MAX_TEMP), isMetric));
 
         // Read low temperature from cursor
-        ((TextView) view.findViewById(R.id.list_item_low_text_view))
+        viewHolder.lowTempView
                 .setText(Utils.formatTemperature(cursor.getFloat(ForecastFragment.COL_WEATHER_MIN_TEMP), isMetric));
+    }
+
+    /**
+     * Cache of the children views for a forecast list item.
+     */
+    public static class ViewHolder {
+        public final ImageView iconView;
+        public final TextView dateView;
+        public final TextView shortDescView;
+        public final TextView highTempView;
+        public final TextView lowTempView;
+
+        public ViewHolder(View view) {
+            iconView = (ImageView) view.findViewById(R.id.list_item_icon);
+            dateView = (TextView) view.findViewById(R.id.list_item_date_text_view);
+            shortDescView = (TextView) view.findViewById(R.id.list_item_forecast_text_view);
+            highTempView = (TextView) view.findViewById(R.id.list_item_high_text_view);
+            lowTempView = (TextView) view.findViewById(R.id.list_item_low_text_view);
+        }
     }
 }
