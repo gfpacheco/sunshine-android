@@ -1,5 +1,6 @@
 package com.gfpacheco.sunshine;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -178,10 +179,11 @@ public class DetailActivity extends ActionBarActivity {
         }
 
         private void updateView(String dateText, String forecast, String high, String low) {
-            ((TextView) getActivity().findViewById(R.id.detail_date_text_view)).setText(dateText);
-            ((TextView) getActivity().findViewById(R.id.detail_forecast_text_view)).setText(forecast);
-            ((TextView) getActivity().findViewById(R.id.detail_high_text_view)).setText(high);
-            ((TextView) getActivity().findViewById(R.id.detail_low_text_view)).setText(low);
+            Activity activity = getActivity();
+            ((TextView) activity.findViewById(R.id.detail_date_text_view)).setText(dateText);
+            ((TextView) activity.findViewById(R.id.detail_forecast_text_view)).setText(forecast);
+            ((TextView) activity.findViewById(R.id.detail_high_text_view)).setText(high);
+            ((TextView) activity.findViewById(R.id.detail_low_text_view)).setText(low);
             mForecast = String.format("%s - %s - %s/%s", dateText, forecast, high, low);
         }
 

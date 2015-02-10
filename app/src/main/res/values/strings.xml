@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <string name="app_name">Sunshine</string>
 
@@ -27,5 +27,11 @@
         <item>@string/pref_units_metric</item>
         <item>@string/pref_units_imperial</item>
     </string-array>
+
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="format_full_friendly_date">
+        <xliff:g id="day_of_week">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g>
+    </string>
 
 </resources>
