@@ -42,8 +42,7 @@
         <ImageView
             android:id="@+id/list_item_icon"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_launcher" />
+            android:layout_height="match_parent" />
 
         <TextView
             android:id="@+id/list_item_forecast_text_view"

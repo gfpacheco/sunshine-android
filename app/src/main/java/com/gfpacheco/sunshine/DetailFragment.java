@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gfpacheco.sunshine.data.WeatherContract;
@@ -40,6 +41,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherContract.WeatherEntry.COLUMN_WIND_DEGREES,
             WeatherContract.WeatherEntry.COLUMN_PRESSURE,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
             WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING
     };
 
@@ -51,6 +53,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final int COL_WEATHER_WIND_SPEED = 6;
     private static final int COL_WEATHER_WIND_DEGREES = 7;
     private static final int COL_WEATHER_PRESSURE = 8;
+    private static final int COL_WEATHER_CONDITION_ID = 9;
 
     private String mLocation;
     private String mForecast;
@@ -145,7 +148,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 Utils.formatTemperature(activity, data.getDouble(COL_WEATHER_MIN_TEMP), isMetric),
                 activity.getString(R.string.format_humidity, data.getFloat(COL_WEATHER_HUMIDITY)),
                 Utils.formatWind(activity, data.getFloat(COL_WEATHER_WIND_SPEED), data.getFloat(COL_WEATHER_WIND_DEGREES)),
-                activity.getString(R.string.format_pressure, data.getFloat(COL_WEATHER_PRESSURE))
+                activity.getString(R.string.format_pressure, data.getFloat(COL_WEATHER_PRESSURE)),
+                Utils.getArtResourceForWeatherCondition(data.getInt(COL_WEATHER_CONDITION_ID))
         );
 
         if (mShareActionProvider != null) {
@@ -153,13 +157,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
     }
 
-    private void updateView(String dateText, String forecast, String high,
-                            String low, String humidity, String wind, String pressure) {
+    private void updateView(String dateText, String forecast, String high, String low,
+                            String humidity, String wind, String pressure, int icon) {
         Activity activity = getActivity();
         ((TextView) activity.findViewById(R.id.detail_date_text_view)).setText(dateText);
         ((TextView) activity.findViewById(R.id.detail_forecast_text_view)).setText(forecast);
         ((TextView) activity.findViewById(R.id.detail_high_text_view)).setText(high);
         ((TextView) activity.findViewById(R.id.detail_low_text_view)).setText(low);
+        ((ImageView) activity.findViewById(R.id.detail_icon)).setImageResource(icon);
         ((TextView) activity.findViewById(R.id.detail_humidity_text_view)).setText(humidity);
         ((TextView) activity.findViewById(R.id.detail_wind_text_view)).setText(wind);
         ((TextView) activity.findViewById(R.id.detail_pressure_text_view)).setText(pressure);

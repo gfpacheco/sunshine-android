@@ -31,7 +31,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_WEATHER_SHORT_DESC = 2;
     public static final int COL_WEATHER_MIN_TEMP = 3;
     public static final int COL_WEATHER_MAX_TEMP = 4;
-    public static final int COL_LOCATION_SETTING = 5;
+    public static final int COL_WEATHER_CONDITION_ID = 5;
+
     private static final int FORECAST_LOADER_ID = 0;
     private static final String[] FORECAST_COLUMNS = {
             WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
@@ -39,6 +40,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             WeatherEntry.COLUMN_SHORT_DESC,
             WeatherEntry.COLUMN_MIN_TEMP,
             WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherEntry.COLUMN_WEATHER_ID,
             LocationEntry.COLUMN_LOCATION_SETTING
     };
     private String mLocation;
