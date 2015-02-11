@@ -1,6 +1,5 @@
 package com.gfpacheco.sunshine;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -105,12 +104,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = mWeekForecastAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(
-                            Intent.EXTRA_TEXT,
-                            cursor.getString(COL_WEATHER_DATE_TEXT)
-                    );
-
-                    startActivity(intent);
+                    ((Callback) getActivity())
+                            .onItemSelected(cursor.getString(COL_WEATHER_DATE_TEXT));
                 }
             }
         });
@@ -148,5 +143,17 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mWeekForecastAdapter.swapCursor(null);
+    }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * Callback for when an item has been selected.
+         */
+        public void onItemSelected(String date);
     }
 }
