@@ -47,6 +47,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private String mLocation;
     private ForecastAdapter mWeekForecastAdapter;
     private int mSelectedIndex = -1;
+    private boolean mUseTodayLayout;
 
     public ForecastFragment() {
     }
@@ -99,6 +100,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mWeekForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        mWeekForecastAdapter.setUseTodayLayout(mUseTodayLayout);
 
         ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
         listView.setAdapter(mWeekForecastAdapter);
@@ -162,6 +164,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mWeekForecastAdapter.swapCursor(null);
+    }
+
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        mUseTodayLayout = useTodayLayout;
+        if (mWeekForecastAdapter != null) {
+            mWeekForecastAdapter.setUseTodayLayout(useTodayLayout);
+        }
     }
 
     /**
