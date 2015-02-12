@@ -42,8 +42,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             WeatherEntry.COLUMN_WEATHER_ID,
             LocationEntry.COLUMN_LOCATION_SETTING
     };
+    private static final String SELECTED_INDEX = "selectedIndex";
+
     private String mLocation;
     private ForecastAdapter mWeekForecastAdapter;
+    private int mSelectedIndex = -1;
 
     public ForecastFragment() {
     }
@@ -107,8 +110,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                     ((Callback) getActivity())
                             .onItemSelected(cursor.getString(COL_WEATHER_DATE_TEXT));
                 }
+                mSelectedIndex = position;
             }
         });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_INDEX)) {
+            mSelectedIndex = savedInstanceState.getInt(SELECTED_INDEX);
+        }
 
         return rootView;
     }
@@ -138,6 +146,17 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mWeekForecastAdapter.swapCursor(data);
+        if (mSelectedIndex != ListView.INVALID_POSITION) {
+            ((ListView) getView().findViewById(R.id.list_view_forecast)).smoothScrollToPosition(mSelectedIndex);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mSelectedIndex != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_INDEX, mSelectedIndex);
+        }
     }
 
     @Override
