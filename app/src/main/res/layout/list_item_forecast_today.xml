@@ -3,16 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/today_touch_selector"
-    android:gravity="center_vertical"
+    android:gravity="bottom"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:orientation="horizontal">
+    android:paddingBottom="16dp"
+    android:paddingLeft="60dp"
+    android:paddingTop="16dp">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginTop="16dp"
         android:layout_weight="7"
         android:gravity="center"
         android:orientation="vertical">
@@ -37,7 +36,6 @@
             android:id="@+id/list_item_low_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/white"
             android:textSize="36sp" />
@@ -47,9 +45,8 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
         android:layout_weight="5"
-        android:gravity="center_horizontal|bottom"
+        android:gravity="center"
         android:orientation="vertical">
 
         <ImageView
