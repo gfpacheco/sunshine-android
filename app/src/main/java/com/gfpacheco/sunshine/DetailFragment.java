@@ -192,8 +192,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             FragmentActivity activity = getActivity();
             boolean isMetric = Utils.isMetricsUnits(activity);
 
-            mFriendlyDateView.setText(Utils.getFriendlyDayString(activity, data.getString(COL_WEATHER_DATE_TEXT)));
-            mDateView.setText(Utils.formatDate(data.getString(COL_WEATHER_DATE_TEXT)));
+            mFriendlyDateView.setText(Utils.getDayName(activity, data.getString(COL_WEATHER_DATE_TEXT)));
+            mDateView.setText(Utils.formatMonthDay(activity, data.getString(COL_WEATHER_DATE_TEXT)));
             mDescriptionView.setText(data.getString(COL_WEATHER_SHORT_DESC));
             mHighTempView.setText(Utils.formatTemperature(activity, data.getDouble(COL_WEATHER_MAX_TEMP), isMetric));
             mLowTempView.setText(Utils.formatTemperature(activity, data.getDouble(COL_WEATHER_MIN_TEMP), isMetric));
