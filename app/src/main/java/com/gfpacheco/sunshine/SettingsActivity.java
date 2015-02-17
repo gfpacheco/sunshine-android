@@ -10,6 +10,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
 import com.gfpacheco.sunshine.data.WeatherContract;
+import com.gfpacheco.sunshine.service.SunshineService;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -61,7 +62,7 @@ public class SettingsActivity extends PreferenceActivity
 
         if (!sBindingPreference) {
             if (preference.getKey().equals(getString(R.string.pref_location_key))) {
-                new FetchWeatherTask(this).execute(stringValue);
+                startService(new Intent(this, SunshineService.class));
             } else {
                 // notify code that weather may be impacted
                 getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);

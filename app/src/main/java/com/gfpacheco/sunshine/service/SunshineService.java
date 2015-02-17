@@ -1,16 +1,16 @@
-package com.gfpacheco.sunshine;
+package com.gfpacheco.sunshine.service;
 
+import android.app.IntentService;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 
+import com.gfpacheco.sunshine.Utils;
 import com.gfpacheco.sunshine.data.WeatherContract;
-import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
-import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,45 +24,43 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 
-public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
+public class SunshineService extends IntentService {
 
-    private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+    private static final String LOG_TAG = SunshineService.class.getName();
 
-    private final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
-    private final String FORECAST_FORMAT_PARAM = "mode";
-    private final String FORECAST_UNITS_PARAM = "units";
-    private final String FORECAST_DAYS_PARAM = "cnt";
-    private final String FORECAST_QUERY_PARAM = "q";
-    private final String FORECAST_FORMAT = "json";
-    private final String FORECAST_UNITS = "metric";
-    private final int FORECAST_DAYS = 14;
+    private static final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
+    private static final String FORECAST_FORMAT_PARAM = "mode";
+    private static final String FORECAST_UNITS_PARAM = "units";
+    private static final String FORECAST_DAYS_PARAM = "cnt";
+    private static final String FORECAST_QUERY_PARAM = "q";
+    private static final String FORECAST_FORMAT = "json";
+    private static final String FORECAST_UNITS = "metric";
+    private static final int FORECAST_DAYS = 14;
 
-    private final Context mContext;
-
-    public FetchWeatherTask(Context context) {
-        mContext = context;
+    public SunshineService() {
+        super("SunshineService");
     }
 
     private long addLocation(String locationSetting, String cityName, double lat, double lon) {
-        Cursor cursor = mContext.getContentResolver().query(
-                LocationEntry.CONTENT_URI,
-                new String[]{LocationEntry._ID},
-                LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
+        Cursor cursor = getContentResolver().query(
+                WeatherContract.LocationEntry.CONTENT_URI,
+                new String[]{WeatherContract.LocationEntry._ID},
+                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
                 new String[]{locationSetting},
                 null);
 
         if (cursor.moveToFirst()) {
-            int locationIdIndex = cursor.getColumnIndex(LocationEntry._ID);
+            int locationIdIndex = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
             return cursor.getLong(locationIdIndex);
         } else {
             ContentValues values = new ContentValues();
-            values.put(LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
-            values.put(LocationEntry.COLUMN_CITY_NAME, cityName);
-            values.put(LocationEntry.COLUMN_COORD_LAT, lat);
-            values.put(LocationEntry.COLUMN_COORD_LONG, lon);
+            values.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
+            values.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
+            values.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, lat);
+            values.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
 
-            Uri locationInsertUri = mContext.getContentResolver().insert(
-                    LocationEntry.CONTENT_URI,
+            Uri locationInsertUri = getContentResolver().insert(
+                    WeatherContract.LocationEntry.CONTENT_URI,
                     values
             );
 
@@ -163,30 +161,27 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
             ContentValues weatherValues = new ContentValues();
 
-            weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationID);
-            weatherValues.put(WeatherEntry.COLUMN_DATE_TEXT,
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationID);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATE_TEXT,
                     WeatherContract.getDbDateString(new Date(dateTime * 1000L)));
-            weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, humidity);
-            weatherValues.put(WeatherEntry.COLUMN_PRESSURE, pressure);
-            weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
-            weatherValues.put(WeatherEntry.COLUMN_WIND_DEGREES, windDirection);
-            weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, high);
-            weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, low);
-            weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, description);
-            weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherId);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, humidity);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, pressure);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_DEGREES, windDirection);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, high);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, low);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, description);
+            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherId);
 
             valueses[i] = weatherValues;
         }
 
-        mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, valueses);
+        getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, valueses);
     }
 
     @Override
-    protected Void doInBackground(String... params) {
-        if (params.length == 0) {
-            return null;
-        }
-        String locationQuery = params[0];
+    protected void onHandleIntent(Intent intent) {
+        String locationQuery = Utils.getLocationPreference(getApplicationContext());
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -219,7 +214,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             StringBuilder buffer = new StringBuilder();
             if (inputStream == null) {
                 // Nothing to do.
-                return null;
+                return;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -233,14 +228,14 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
-                return null;
+                return;
             }
             forecastJsonStr = buffer.toString();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
-            return null;
+            return;
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -260,8 +255,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
-
-        return null;
     }
 
 }

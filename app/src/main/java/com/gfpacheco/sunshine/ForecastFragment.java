@@ -1,5 +1,7 @@
 package com.gfpacheco.sunshine;
 
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,12 +22,12 @@ import android.widget.ListView;
 import com.gfpacheco.sunshine.data.WeatherContract;
 import com.gfpacheco.sunshine.data.WeatherContract.LocationEntry;
 import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
+import com.gfpacheco.sunshine.service.SunshineService;
 
 import java.util.Date;
 
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final int COL_WEATHER_ID = 0;
     public static final int COL_WEATHER_DATE_TEXT = 1;
     public static final int COL_WEATHER_SHORT_DESC = 2;
     public static final int COL_WEATHER_MIN_TEMP = 3;
@@ -90,8 +92,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateWeather() {
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
-        weatherTask.execute(mLocation);
+        Context activity = getActivity();
+        activity.startService(new Intent(activity, SunshineService.class));
     }
 
     @Override

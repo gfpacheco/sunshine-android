@@ -37,6 +37,8 @@
         <provider
             android:name=".data.WeatherProvider"
             android:authorities="com.gfpacheco.sunshine" />
+
+        <service android:name=".service.SunshineService" />
     </application>
 
 </manifest>
