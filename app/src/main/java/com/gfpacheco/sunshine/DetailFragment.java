@@ -201,6 +201,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mWindView.setText(Utils.formatWind(activity, data.getFloat(COL_WEATHER_WIND_SPEED), data.getFloat(COL_WEATHER_WIND_DEGREES)));
             mPressureView.setText(activity.getString(R.string.format_pressure, data.getFloat(COL_WEATHER_PRESSURE)));
             mIconView.setImageResource(Utils.getArtResourceForWeatherCondition(data.getInt(COL_WEATHER_CONDITION_ID)));
+            mIconView.setContentDescription(data.getString(COL_WEATHER_SHORT_DESC));
 
             mForecast = String.format(
                     "%s - %s - %s/%s",
