@@ -35,6 +35,9 @@ import java.util.Date;
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
 
+    private static final int SYNC_INTERVAL = 10800; // 3 hours in seconds
+    private static final int SYNC_FLEXTIME = 3600; // 1 hour in seconds
+
     private static final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
     private static final String FORECAST_FORMAT_PARAM = "mode";
     private static final String FORECAST_UNITS_PARAM = "units";
@@ -309,7 +312,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
              * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
-
+            onAccountCreated(newAccount, context);
         }
         return newAccount;
     }
@@ -328,5 +331,15 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         } else {
             ContentResolver.addPeriodicSync(account, authority, new Bundle(), syncInterval);
         }
+    }
+
+    private static void onAccountCreated(Account newAccount, Context context) {
+        SunshineSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
+        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
+        syncImmediately(context);
+    }
+
+    public static void initializeSyncAdapter(Context context) {
+        getSyncAccount(context);
     }
 }
