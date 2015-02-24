@@ -1,14 +1,22 @@
-package com.gfpacheco.sunshine.service;
+package com.gfpacheco.sunshine.sync;
 
-import android.app.IntentService;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
+import android.content.SyncRequest;
+import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
+import com.gfpacheco.sunshine.R;
 import com.gfpacheco.sunshine.Utils;
 import com.gfpacheco.sunshine.data.WeatherContract;
 
@@ -24,9 +32,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 
-public class SunshineService extends IntentService {
-
-    private static final String LOG_TAG = SunshineService.class.getName();
+public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
+    public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
 
     private static final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
     private static final String FORECAST_FORMAT_PARAM = "mode";
@@ -37,12 +44,12 @@ public class SunshineService extends IntentService {
     private static final String FORECAST_UNITS = "metric";
     private static final int FORECAST_DAYS = 14;
 
-    public SunshineService() {
-        super("SunshineService");
+    public SunshineSyncAdapter(Context context, boolean autoInitialize) {
+        super(context, autoInitialize);
     }
 
     private long addLocation(String locationSetting, String cityName, double lat, double lon) {
-        Cursor cursor = getContentResolver().query(
+        Cursor cursor = getContext().getContentResolver().query(
                 WeatherContract.LocationEntry.CONTENT_URI,
                 new String[]{WeatherContract.LocationEntry._ID},
                 WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
@@ -59,7 +66,7 @@ public class SunshineService extends IntentService {
             values.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, lat);
             values.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
 
-            Uri locationInsertUri = getContentResolver().insert(
+            Uri locationInsertUri = getContext().getContentResolver().insert(
                     WeatherContract.LocationEntry.CONTENT_URI,
                     values
             );
@@ -77,8 +84,6 @@ public class SunshineService extends IntentService {
      */
     private void getWeatherDataFromJson(String forecastJsonStr, int numDays, String locationSetting)
             throws JSONException {
-
-
         // These are the names of the JSON objects that need to be extracted.
 
         // Location information
@@ -176,12 +181,13 @@ public class SunshineService extends IntentService {
             valueses[i] = weatherValues;
         }
 
-        getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, valueses);
+        getContext().getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, valueses);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        String locationQuery = Utils.getLocationPreference(getApplicationContext());
+    public void onPerformSync(Account account, Bundle extras, String authority,
+                              ContentProviderClient provider, SyncResult syncResult) {
+        String locationQuery = Utils.getLocationPreference(getContext());
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -257,4 +263,70 @@ public class SunshineService extends IntentService {
         }
     }
 
+    /**
+     * Helper method to have the sync adapter sync immediately
+     *
+     * @param context The context used to access the account service
+     */
+    public static void syncImmediately(Context context) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+    }
+
+    /**
+     * Helper method to get the fake account to be used with SyncAdapter, or make a new one
+     * if the fake account doesn't exist yet.  If we make a new account, we call the
+     * onAccountCreated method so we can initialize things.
+     *
+     * @param context The context used to access the account service
+     * @return a fake account.
+     */
+    public static Account getSyncAccount(Context context) {
+        // Get an instance of the Android account manager
+        AccountManager accountManager =
+                (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+
+        // Create the account type and default account
+        Account newAccount = new Account(
+                context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+
+        // If the password doesn't exist, the account doesn't exist
+        if (null == accountManager.getPassword(newAccount)) {
+
+        /*
+         * Add the account and account type, no password or user data
+         * If successful, return the Account object, otherwise report an error.
+         */
+            if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
+                return null;
+            }
+            /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+
+        }
+        return newAccount;
+    }
+
+    public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
+        Account account = getSyncAccount(context);
+        String authority = context.getString(R.string.content_authority);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // we can enable inexact timers in our periodic sync
+            SyncRequest request = new SyncRequest.Builder()
+                    .syncPeriodic(syncInterval, flexTime)
+                    .setSyncAdapter(account, authority)
+                    .setExtras(new Bundle())
+                    .build();
+            ContentResolver.requestSync(request);
+        } else {
+            ContentResolver.addPeriodicSync(account, authority, new Bundle(), syncInterval);
+        }
+    }
 }

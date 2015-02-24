@@ -41,4 +41,7 @@
 
     <string name="format_pressure">Pressure: <xliff:g id="pressure">%1.0f</xliff:g> hPa</string>
 
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">sunshine.gfpacheco.com</string>
+    <string name="content_authority">com.gfpacheco.sunshine</string>
 </resources>
