@@ -28,6 +28,11 @@
         <item>@string/pref_units_imperial</item>
     </string-array>
 
+    <string name="pref_enable_notification_title">Weather Notifications</string>
+    <string name="pref_enable_notification_key">enable_notifications</string>
+    <string name="pref_enable_notification_true">Enabled</string>
+    <string name="pref_enable_notification_false">Disabled</string>
+
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="format_full_friendly_date"><xliff:g id="day_of_week">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g></string>
