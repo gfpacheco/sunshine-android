@@ -1,5 +1,6 @@
 package com.gfpacheco.sunshine;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +33,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_WEATHER_MIN_TEMP = 3;
     public static final int COL_WEATHER_MAX_TEMP = 4;
     public static final int COL_WEATHER_CONDITION_ID = 5;
+    public static final int COL_LOCATION_COORD_LAT = 6;
+    public static final int COL_LOCATION_COORD_LONG = 7;
 
     private static final int FORECAST_LOADER_ID = 0;
     private static final String[] FORECAST_COLUMNS = {
@@ -40,7 +44,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             WeatherEntry.COLUMN_MIN_TEMP,
             WeatherEntry.COLUMN_MAX_TEMP,
             WeatherEntry.COLUMN_WEATHER_ID,
-            LocationEntry.COLUMN_LOCATION_SETTING
+            LocationEntry.COLUMN_COORD_LAT,
+            LocationEntry.COLUMN_COORD_LONG
     };
     private static final String SELECTED_INDEX = "selectedIndex";
 
@@ -81,9 +86,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_refresh) {
-            updateWeather();
-            return true;
+        switch (id) {
+            case R.id.action_refresh:
+                updateWeather();
+                return true;
+            case R.id.action_map:
+                openPreferredLocationInMap();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -91,6 +100,22 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void updateWeather() {
         SunshineSyncAdapter.syncImmediately(getActivity());
+    }
+
+    private void openPreferredLocationInMap() {
+        Cursor cursor = mWeekForecastAdapter.getCursor();
+        cursor.moveToFirst();
+
+        String locationLat = cursor.getString(COL_LOCATION_COORD_LAT);
+        String locationLong = cursor.getString(COL_LOCATION_COORD_LONG);
+
+        Uri geoLocationUri = Uri.parse("geo:" + locationLat + "," + locationLong);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(geoLocationUri);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     @Override

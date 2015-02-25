@@ -1,9 +1,7 @@
 package com.gfpacheco.sunshine;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,28 +53,9 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
-            case R.id.action_map:
-                openPreferredLocationInMap();
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void openPreferredLocationInMap() {
-        String location = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
-
-        Uri geoLocationUri = Uri.parse("geo:0,0?")
-                .buildUpon()
-                .appendQueryParameter("q", location)
-                .build();
-
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(geoLocationUri);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
     }
 
     @Override
