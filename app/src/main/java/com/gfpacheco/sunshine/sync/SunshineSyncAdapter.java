@@ -27,6 +27,7 @@ import com.gfpacheco.sunshine.MainActivity;
 import com.gfpacheco.sunshine.R;
 import com.gfpacheco.sunshine.Utils;
 import com.gfpacheco.sunshine.data.WeatherContract;
+import com.gfpacheco.sunshine.data.WeatherContract.WeatherEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +39,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
@@ -282,11 +284,21 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             getWeatherDataFromJson(forecastJsonStr, FORECAST_DAYS, locationQuery);
+            clearOldData();
             notifyWeather();
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
+    }
+
+    private void clearOldData() {
+        Calendar cal = Calendar.getInstance(); //Get's a calendar object with the current time.
+        cal.add(Calendar.DATE, -1); //Signifies yesterday's date
+        String yesterdayDate = WeatherContract.getDbDateString(cal.getTime());
+        getContext().getContentResolver().delete(WeatherEntry.CONTENT_URI,
+                WeatherEntry.COLUMN_DATE_TEXT + " <= ?",
+                new String[]{yesterdayDate});
     }
 
     /**
